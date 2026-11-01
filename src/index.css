@@ -2,6 +2,7 @@
 @import "tailwindcss";
 
 @theme {
+  --color-brand: #D35B34;
   --color-brand-primary: #D35B34;
   --color-brand-hover: #BC4F2C;
   --color-brand-subtle: #FFF5F1;
@@ -29,6 +30,7 @@
 }
 
 :root {
+  --brand: #D35B34;
   --brand-primary: #D35B34;
   --brand-hover: #BC4F2C;
   --brand-subtle: #FFF5F1;
