@@ -7,7 +7,7 @@ export interface PillProps {
   /** Pill content or label */
   children?: ReactNode
   /** Visual variant conforming to design tokens */
-  variant?: 'neutral' | 'sweet-spot' | 'timer' | 'tag' | 'chip'
+  variant?: 'neutral' | 'sweet-spot' | 'highlight' | 'timer' | 'tag' | 'chip'
   /** Sizing of the pill */
   size?: 'sm' | 'md'
   /** Optional icon prefix */
@@ -31,6 +31,8 @@ export interface PillProps {
 const variantStyles: Record<NonNullable<PillProps['variant']>, string> = {
   neutral: 'bg-surface-card text-stone-700 border border-surface-border',
   'sweet-spot':
+    'bg-accent-amber text-accent-amber-text border border-amber-300/60 font-bold uppercase tracking-wider',
+  highlight:
     'bg-accent-amber text-accent-amber-text border border-amber-300/60 font-bold uppercase tracking-wider',
   timer: 'bg-cream-200 text-stone-700 border border-cream-300 font-medium',
   tag: 'bg-cream-100 text-stone-800 border border-surface-border font-medium',
