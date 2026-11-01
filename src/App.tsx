@@ -1,119 +1,253 @@
-import { useState } from 'react'
-import { AlertTriangle, Sparkles, Square } from 'lucide-react'
-import { IngredientPicker } from './components/IngredientPicker'
-import { CookingAnimation } from './components/Loading'
-import { RecipeCard } from './components/RecipeCard'
-import { useCozyAI } from './hooks/useCozyAI'
-import { TAKEOUT_QUIPS, VIBES, findNonEdible } from './lib/data'
-import type { VibeId } from './types'
+import { useCallback, useState } from 'react'
+import { InfoBox } from './components/common/index.ts'
+import {
+  CustomIngredientInput,
+  EnergySection,
+  IngredientGrid,
+  SubmitButton,
+} from './components/pantry/index.ts'
+import { CulinaryNotes, RecipeCard } from './components/recipe/index.ts'
+import {
+  INITIAL_PANTRY_INGREDIENTS,
+  INITIAL_RECIPE,
+} from './constants/pantryData.ts'
+import { findNonEdible } from './lib/data.ts'
+import { parseRecipe } from './lib/parseRecipe.ts'
+import type { DietaryFilter, EnergyMode, Recipe } from './types/recipe.ts'
+import { getFriendlyErrorMessage } from './utils/errorHandler.ts'
+
+/**
+ * Transforms edge API markdown result into structured Recipe interface.
+ */
+function parseApiResultToRecipe(raw: string, fallbackIngredients: string[]): Recipe {
+  const parsed = parseRecipe(raw)
+  if (!parsed) {
+    return {
+      title: 'Cozy Skillet Dish',
+      cookingTime: '15 mins',
+      technique: 'Cozy Stovetop',
+      ingredientsUsed: fallbackIngredients,
+      steps: [raw.replace(/^#+.*\n?/, '').trim()],
+      tip: 'Season to taste with sea salt, freshly ground pepper, and gentle warmth.',
+    }
+  }
+
+  const ingredientsList = parsed.ingredients
+    ? parsed.ingredients.split(',').map((s) => s.trim()).filter(Boolean)
+    : fallbackIngredients
+
+  return {
+    title: parsed.title || 'Cozy Pantry Dish',
+    cookingTime: parsed.effort || '15 mins',
+    technique: 'Cozy Stovetop',
+    ingredientsUsed: ingredientsList.length > 0 ? ingredientsList : fallbackIngredients,
+    steps:
+      parsed.steps.length > 0
+        ? parsed.steps
+        : ['Combine and warm ingredients in a skillet until fragrant and golden.'],
+    tip:
+      parsed.tip ||
+      'Cold day-old rice crisps twice as fast as freshly steamed rice because starch molecules retrograde in the fridge.',
+  }
+}
 
 export default function App() {
-  const ai = useCozyAI()
-  const [ingredients, setIngredients] = useState<string[]>([])
-  const [vibeId, setVibeId] = useState<VibeId>('cozy')
-  const [takeout, setTakeout] = useState<string | null>(null)
+  // Preset initial states mirroring the screenshot
+  const [selectedIngredientIds, setSelectedIngredientIds] = useState<string[]>([
+    'egg',
+    'cheese',
+    'butter',
+    'rice',
+  ])
+  const [customIngredients, setCustomIngredients] = useState<string[]>([
+    'Chili Crisp',
+    'Fresh Garlic',
+  ])
+  const [energyMode, setEnergyMode] = useState<EnergyMode>('cozy')
+  const [dietaryFilters, setDietaryFilters] = useState<DietaryFilter[]>([])
 
-  const vibe = VIBES.find((v) => v.id === vibeId)!
-  const busy = ai.status === 'loading' || ai.status === 'generating'
-  const exists = (n: string) => ingredients.some((i) => i.toLowerCase() === n.toLowerCase())
+  const [recipe, setRecipe] = useState<Recipe>(INITIAL_RECIPE)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [error, setError] = useState<unknown | null>(null)
 
-  const add = (n: string) => !exists(n) && setIngredients((l) => [...l, n.trim()])
-  const remove = (n: string) => setIngredients((l) => l.filter((i) => i !== n))
-  const toggle = (n: string) => {
-    if (exists(n)) setIngredients((l) => l.filter((i) => i.toLowerCase() !== n.toLowerCase()))
-    else add(n)
-  }
+  // Toggle staple ingredient by ID
+  const handleToggleIngredient = useCallback((id: string) => {
+    setSelectedIngredientIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    )
+  }, [])
 
-  const spin = () => {
-    if (!ingredients.length || busy) return
-    if (findNonEdible(ingredients)) {
-      setTakeout(TAKEOUT_QUIPS[0])
-      ai.reset()
+  // Append custom ingredient string
+  const handleAddCustomIngredient = useCallback((name: string) => {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    setCustomIngredients((prev) =>
+      prev.some((item) => item.toLowerCase() === trimmed.toLowerCase())
+        ? prev
+        : [...prev, trimmed]
+    )
+  }, [])
+
+  // Remove custom ingredient string
+  const handleRemoveCustomIngredient = useCallback((name: string) => {
+    setCustomIngredients((prev) => prev.filter((item) => item !== name))
+  }, [])
+
+  // Toggle dietary filter
+  const handleToggleDietaryFilter = useCallback((filter: DietaryFilter) => {
+    setDietaryFilters((prev) =>
+      prev.includes(filter) ? prev.filter((item) => item !== filter) : [...prev, filter]
+    )
+  }, [])
+
+  // Generate / Spin recipe action
+  const handleGenerateRecipe = useCallback(async () => {
+    const stapleNames = INITIAL_PANTRY_INGREDIENTS.filter((item) =>
+      selectedIngredientIds.includes(item.id)
+    ).map((item) => item.name)
+
+    const allIngredients = [...stapleNames, ...customIngredients]
+
+    if (allIngredients.length === 0) {
+      setError('Please select between 1 and 12 ingredients.')
       return
     }
-    setTakeout(null)
-    ai.generate(ingredients, vibe.prompt)
-  }
 
-  const hasOutput = ai.output.trim().length > 0
+    if (allIngredients.length > 12) {
+      setError('Please select between 1 and 12 ingredients.')
+      return
+    }
+
+    // Client-side inedible check guardrail
+    if (findNonEdible(allIngredients)) {
+      setError('NOT_FOOD')
+      return
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/recipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ingredients: allIngredients,
+          energy: energyMode,
+          dietary: dietaryFilters,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || `Server error (${res.status})`)
+      }
+
+      if (data.result) {
+        const nextRecipe = parseApiResultToRecipe(data.result, allIngredients)
+        setRecipe(nextRecipe)
+      } else {
+        throw new Error('No recipe was returned from the kitchen.')
+      }
+    } catch (err: unknown) {
+      setError(err)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [selectedIngredientIds, customIngredients, energyMode, dietaryFilters])
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:py-14">
-      <header className="mb-8 text-center">
-        <div className="text-5xl animate-bob inline-block">🧑‍🍳</div>
-        <h1 className="mt-2 font-display text-4xl font-bold sm:text-5xl">FridgeLab AI</h1>
-        <p className="mx-auto mt-2 max-w-md font-semibold opacity-70">
-          Tell me what's lurking in your fridge and I'll invent a cozy dish.
+    <div className="min-h-screen bg-cream-100 px-4 py-10 sm:px-6 sm:py-14 lg:px-8 text-stone-900 font-sans">
+      {/* Editorial Page Header */}
+      <header className="mx-auto max-w-2xl text-center">
+        <h1 className="font-serif text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl lg:text-6xl">
+          FridgeLab AI
+        </h1>
+        <p className="mt-1 font-serif text-2xl sm:text-3xl lg:text-4xl italic text-brand font-normal">
+          will invent a cozy dish.
+        </p>
+        <p className="mx-auto mt-4 max-w-lg text-center text-xs sm:text-sm text-stone-600 leading-relaxed">
+          Select whatever ingredients are on hand. Instant culinary combinations
+          computed straight in the browser with zero grocery runs.
         </p>
       </header>
 
-      <main className="space-y-6">
-        <div className="rounded-3xl border-[3px] border-white bg-white/60 p-5 shadow-lg backdrop-blur sm:p-7">
-          <IngredientPicker
-            ingredients={ingredients}
-            onToggle={toggle}
-            onAdd={add}
-            onRemove={remove}
-            vibe={vibeId}
-            onVibe={setVibeId}
-            disabled={busy}
-          />
-
-          <div className="mt-7 flex gap-3">
-            <button
-              id="cook-button"
-              onClick={spin}
-              disabled={!ingredients.length || busy}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-terracotta px-6 py-4 text-lg font-extrabold text-white shadow-[0_5px_0_0_#b85c43] transition hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+      {/* Main Content: Two-column desktop grid, single column mobile */}
+      <main className="mx-auto mt-10 max-w-6xl">
+        {/* Error notice banner */}
+        {Boolean(error) && (
+          <div className="mb-6">
+            <InfoBox
+              variant="error"
+              title="Kitchen Notice"
+              onDismiss={() => setError(null)}
             >
-              <Sparkles size={20} />
-              {ingredients.length ? 'Cook Something Cozy' : 'Pick some ingredients first'}
-            </button>
-            {ai.status === 'generating' && (
-              <button
-                onClick={ai.interrupt}
-                aria-label="Stop generating"
-                className="rounded-full border-2 border-cocoa bg-white px-5 font-bold"
-              >
-                <Square size={18} />
-              </button>
-            )}
+              {getFriendlyErrorMessage(error)}
+            </InfoBox>
           </div>
+        )}
+
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+          {/* Left Column (Pantry Form Sections) */}
+          <section
+            aria-label="Recipe configuration"
+            className="rounded-3xl border border-surface-border bg-surface-card p-5 sm:p-7 shadow-xs space-y-7 lg:col-span-7"
+          >
+            {/* Step 1: Ingredient Grid */}
+            <IngredientGrid
+              selectedIds={selectedIngredientIds}
+              onToggleIngredient={handleToggleIngredient}
+            />
+
+            <hr className="border-surface-border" />
+
+            {/* Step 2: Custom Ingredient Input */}
+            <CustomIngredientInput
+              customIngredients={customIngredients}
+              onAddIngredient={handleAddCustomIngredient}
+              onRemoveIngredient={handleRemoveCustomIngredient}
+            />
+
+            <hr className="border-surface-border" />
+
+            {/* Step 3: Energy Mode & Dietary Filters */}
+            <EnergySection
+              selectedMode={energyMode}
+              onSelectMode={setEnergyMode}
+              selectedDietaryFilters={dietaryFilters}
+              onToggleDietaryFilter={handleToggleDietaryFilter}
+            />
+
+            {/* Submit Action */}
+            <SubmitButton
+              onClick={handleGenerateRecipe}
+              isLoading={isLoading}
+              disabled={isLoading}
+            />
+          </section>
+
+          {/* Right Column (Recipe Display & Side Notes) */}
+          <section
+            aria-label="Generated recipe and notes"
+            className="space-y-6 lg:col-span-5 lg:sticky lg:top-8"
+          >
+            {/* Tonight's Special Recipe Card */}
+            <RecipeCard
+              recipe={recipe}
+              isLoading={isLoading}
+              onRetry={handleGenerateRecipe}
+            />
+
+            {/* Culinary Side Notes & AI Disclaimer */}
+            <CulinaryNotes tip={recipe?.tip} />
+          </section>
         </div>
-
-        {ai.status === 'generating' && !hasOutput && <CookingAnimation />}
-
-        {ai.status === 'error' && (
-          <div role="alert" className="flex gap-3 rounded-2xl border-2 border-red-300 bg-red-50 p-4 font-semibold text-red-800">
-            <AlertTriangle className="shrink-0" />
-            <div>
-              Oops, the kitchen caught fire: {ai.error}
-              <div className="mt-1 text-sm font-normal">
-                Please check your connection or try again in a moment.
-              </div>
-            </div>
-          </div>
-        )}
-
-        {takeout && (
-          <div className="animate-rise rounded-3xl border-[3px] border-lilac bg-white p-6 text-center shadow-xl">
-            <div className="text-5xl">🥡</div>
-            <p className="mt-3 text-lg font-bold">{takeout}</p>
-          </div>
-        )}
-
-        {hasOutput && !takeout && (
-          <RecipeCard
-            raw={ai.output}
-            streaming={ai.status === 'generating'}
-            dishes={vibe.dishes}
-            onRetry={spin}
-          />
-        )}
       </main>
 
-      <footer className="mt-10 text-center text-xs font-bold opacity-40">
-        FridgeLab AI
+      {/* Footer */}
+      <footer className="mt-16 text-center text-xs text-stone-500 font-sans tracking-tight">
+        FridgeLab AI v0.1.0 · 2026 · All rights reserved.
       </footer>
     </div>
   )

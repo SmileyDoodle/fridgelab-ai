@@ -3,6 +3,7 @@ import type {
   EnergyModeOption,
   Ingredient,
   IngredientCategory,
+  Recipe,
 } from '../types/recipe.ts'
 
 /**
@@ -70,3 +71,22 @@ export const PANTRY_CATEGORIES: readonly { id: IngredientCategory; label: string
   { id: 'produce', label: 'Produce' },
   { id: 'carbs', label: 'Carbs' },
 ] as const
+
+/**
+ * Default demonstration recipe matching the warm editorial design.
+ */
+export const INITIAL_RECIPE: Recipe = {
+  title: 'Butter-Crisped Rice with Egg & Cheese',
+  cookingTime: '12 mins',
+  technique: 'Cozy Skillet',
+  ingredientsUsed: ['Butter', 'Rice', 'Eggs', 'Cheese', 'Chili Crisp'],
+  steps: [
+    'Melt butter in a skillet over medium-high heat until foaming and fragrant.',
+    'Press rice flat against the skillet to form an even, golden bottom crust.',
+    'Fry eggs alongside until whites set with rich runny yolks.',
+    'Fold cheese over the hot crust until gently melted and bubbly.',
+    'Finish with a drizzle of chili crisp and serve warm straight from the pan.',
+  ],
+  tip: 'Cold day-old rice crisps twice as fast as freshly steamed rice because starch molecules retrograde in the fridge.',
+}
+
