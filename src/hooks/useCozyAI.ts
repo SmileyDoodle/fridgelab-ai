@@ -1,90 +1,94 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import type {
-  AIStatus,
-  LoadProgress,
-  WorkerRequest,
-  WorkerResponse,
-} from '../types'
+import { useCallback, useRef, useState } from 'react'
+import type { AIStatus, LoadProgress } from '../types'
 
-const EMPTY_PROGRESS: LoadProgress = { percent: 0, loadedMB: 0, totalMB: 0, label: '' }
+const EMPTY_PROGRESS: LoadProgress = { percent: 100, loadedMB: 0, totalMB: 0, label: '' }
 
-/** Orchestrates the inference Web Worker: loading, streaming and errors. */
+/**
+ * Orchestrates recipe generation via the Cloudflare Pages Function edge backend (/api/recipe).
+ */
 export function useCozyAI() {
-  const workerRef = useRef<Worker | null>(null)
   const [status, setStatus] = useState<AIStatus>('idle')
-  const [progress, setProgress] = useState<LoadProgress>(EMPTY_PROGRESS)
+  const [progress] = useState<LoadProgress>(EMPTY_PROGRESS)
   const [output, setOutput] = useState('')
-  const [device, setDevice] = useState<'webgpu' | 'wasm' | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [isModelReady, setIsModelReady] = useState(false)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
-  useEffect(() => {
-    const worker = new Worker(new URL('../worker.ts', import.meta.url), { type: 'module' })
-    workerRef.current = worker
+  const generate = useCallback(async (ingredients: string[], vibePrompt: string) => {
+    // Cancel any previous in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    const controller = new AbortController()
+    abortControllerRef.current = controller
 
-    worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
-      const msg = e.data
-      switch (msg.type) {
-        case 'device':
-          setDevice(msg.device)
-          break
-        case 'loading':
-          setStatus('loading')
-          break
-        case 'progress':
-          setProgress(msg.progress)
-          break
-        case 'ready':
-          setIsModelReady(true)
-          setStatus((s) => (s === 'loading' ? 'ready' : s))
-          break
-        case 'start':
-          setOutput('')
-          setStatus('generating')
-          break
-        case 'token':
-          setOutput((o) => o + msg.text)
-          break
-        case 'complete':
-          setOutput(msg.text)
-          setStatus('ready')
-          break
-        case 'error':
-          setError(msg.message)
-          setStatus('error')
-          break
+    setError(null)
+    setOutput('')
+    setStatus('generating')
+
+    try {
+      const res = await fetch('/api/recipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ingredients,
+          energy: vibePrompt,
+        }),
+        signal: controller.signal,
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || `Server error (${res.status})`)
       }
-    }
-    worker.onerror = (e) => {
-      setError(e.message || 'The kitchen worker crashed.')
-      setStatus('error')
-    }
 
-    return () => {
-      worker.terminate()
-      workerRef.current = null
+      if (data.result) {
+        setOutput(data.result)
+        setStatus('ready')
+      } else {
+        throw new Error('No recipe was returned from the kitchen.')
+      }
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        setStatus('ready')
+        return
+      }
+      setError(err.message || 'Cooking failed. Please try again.')
+      setStatus('error')
+    } finally {
+      if (abortControllerRef.current === controller) {
+        abortControllerRef.current = null
+      }
     }
   }, [])
 
-  const send = useCallback((msg: WorkerRequest) => workerRef.current?.postMessage(msg), [])
+  const interrupt = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+    }
+    setStatus('ready')
+  }, [])
 
-  const generate = useCallback(
-    (ingredients: string[], vibePrompt: string) => {
-      setError(null)
-      setOutput('')
-      // Show the loading/generating UI immediately; worker refines the status.
-      setStatus(isModelReady ? 'generating' : 'loading')
-      send({ type: 'generate', ingredients, vibePrompt })
-    },
-    [isModelReady, send],
-  )
-
-  const interrupt = useCallback(() => send({ type: 'interrupt' }), [send])
   const reset = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+    }
     setOutput('')
     setError(null)
-    setStatus(isModelReady ? 'ready' : 'idle')
-  }, [isModelReady])
+    setStatus('idle')
+  }, [])
 
-  return { status, progress, output, device, error, isModelReady, generate, interrupt, reset }
+  return {
+    status,
+    progress,
+    output,
+    device: null,
+    error,
+    isModelReady: true,
+    generate,
+    interrupt,
+    reset,
+  }
 }

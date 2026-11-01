@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { AlertTriangle, Sparkles, Square } from 'lucide-react'
 import { IngredientPicker } from './components/IngredientPicker'
-import { CookingAnimation, LoadingBar } from './components/Loading'
-import { ModelStorage } from './components/ModelStorage'
+import { CookingAnimation } from './components/Loading'
 import { RecipeCard } from './components/RecipeCard'
 import { useCozyAI } from './hooks/useCozyAI'
 import { TAKEOUT_QUIPS, VIBES, findNonEdible } from './lib/data'
@@ -44,7 +43,7 @@ export default function App() {
         <div className="text-5xl animate-bob inline-block">🧑‍🍳</div>
         <h1 className="mt-2 font-display text-4xl font-bold sm:text-5xl">FridgeLab AI</h1>
         <p className="mx-auto mt-2 max-w-md font-semibold opacity-70">
-          Tell me what's lurking in your fridge and I'll invent a cozy dish — 100% free, right in your browser.
+          Tell me what's lurking in your fridge and I'll invent a cozy dish.
         </p>
       </header>
 
@@ -82,7 +81,6 @@ export default function App() {
           </div>
         </div>
 
-        {ai.status === 'loading' && <LoadingBar progress={ai.progress} device={ai.device} />}
         {ai.status === 'generating' && !hasOutput && <CookingAnimation />}
 
         {ai.status === 'error' && (
@@ -91,7 +89,7 @@ export default function App() {
             <div>
               Oops, the kitchen caught fire: {ai.error}
               <div className="mt-1 text-sm font-normal">
-                Try a Chromium browser with WebGPU, or check your connection for the first download.
+                Please check your connection or try again in a moment.
               </div>
             </div>
           </div>
@@ -114,10 +112,9 @@ export default function App() {
         )}
       </main>
 
-      <footer className="mt-10 text-center text-xs font-bold opacity-50">
-        Runs locally with Qwen2.5-0.5B · {ai.device === 'webgpu' ? 'WebGPU accelerated' : ai.device === 'wasm' ? 'CPU / WASM' : 'no servers, no keys'}
+      <footer className="mt-10 text-center text-xs font-bold opacity-40">
+        FridgeLab AI
       </footer>
-      <ModelStorage disabled={busy} />
     </div>
   )
 }

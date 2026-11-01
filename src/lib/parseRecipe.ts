@@ -22,11 +22,11 @@ export function parseRecipe(raw: string): ParsedRecipe | null {
       recipe.title = clean(heading[1])
       continue
     }
-    const field = t.match(/^[-*]?\s*\**\s*(Effort|Ingredients(?: Used)?|Steps|Chef['’]s Cozy Tip|Cozy Tip|Tip)\s*:?\**\s*:?\s*(.*)$/i)
+    const field = t.match(/^[-*]?\s*\**\s*(Effort|Vibe|Energy|Ingredients(?: Used)?|Steps|Chef['’]s Cozy Tip|Cozy Tip|Tip)\s*:?\**\s*:?\s*(.*)$/i)
     if (field) {
       const key = field[1].toLowerCase()
       const val = clean(field[2])
-      if (key.startsWith('effort')) recipe.effort = val
+      if (key.startsWith('effort') || key.startsWith('vibe') || key.startsWith('energy')) recipe.effort = val
       else if (key.startsWith('ingredient')) recipe.ingredients = val
       else if (!key.startsWith('step')) recipe.tip = val
       continue
