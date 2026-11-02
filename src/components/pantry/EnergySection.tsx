@@ -4,8 +4,8 @@ import type { DietaryFilter, EnergyMode } from '../../types/recipe.ts'
 import { EnergyCard } from './EnergyCard.tsx'
 
 export interface EnergySectionProps {
-  /** Currently selected energy mode */
-  selectedMode: EnergyMode
+  /** Currently selected energy mode or null if none selected */
+  selectedMode: EnergyMode | null
   /** Selection callback for energy mode */
   onSelectMode: (mode: EnergyMode) => void
   /** Currently active dietary filters */

@@ -6,11 +6,16 @@ import {
   IngredientGrid,
   SubmitButton,
 } from './components/pantry/index.ts'
-import { CulinaryNotes, RecipeCard } from './components/recipe/index.ts'
 import {
-  INITIAL_PANTRY_INGREDIENTS,
-  INITIAL_RECIPE,
-} from './constants/pantryData.ts'
+  CulinaryNotes,
+  RecipeCard,
+  WaitingSkilletCard,
+} from './components/recipe/index.ts'
+import { INITIAL_PANTRY_INGREDIENTS } from './constants/pantryData.ts'
+import {
+  QUICK_INSPIRATIONS,
+  type QuickInspiration,
+} from './constants/quickInspirations.ts'
 import { findNonEdible } from './lib/data.ts'
 import { parseRecipe } from './lib/parseRecipe.ts'
 import type { DietaryFilter, EnergyMode, Recipe } from './types/recipe.ts'
@@ -52,21 +57,14 @@ function parseApiResultToRecipe(raw: string, fallbackIngredients: string[]): Rec
 }
 
 export default function App() {
-  // Preset initial states mirroring the screenshot
-  const [selectedIngredientIds, setSelectedIngredientIds] = useState<string[]>([
-    'egg',
-    'cheese',
-    'butter',
-    'rice',
-  ])
-  const [customIngredients, setCustomIngredients] = useState<string[]>([
-    'Chili Crisp',
-    'Fresh Garlic',
-  ])
-  const [energyMode, setEnergyMode] = useState<EnergyMode>('cozy')
+  // Default clean state: nothing selected on the left side (1-3)
+  const [selectedIngredientIds, setSelectedIngredientIds] = useState<string[]>([])
+  const [customIngredients, setCustomIngredients] = useState<string[]>([])
+  const [energyMode, setEnergyMode] = useState<EnergyMode | null>(null)
   const [dietaryFilters, setDietaryFilters] = useState<DietaryFilter[]>([])
 
-  const [recipe, setRecipe] = useState<Recipe>(INITIAL_RECIPE)
+  // Default to null so "Your skillet is waiting" card shows by default
+  const [recipe, setRecipe] = useState<Recipe | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<unknown | null>(null)
 
@@ -110,6 +108,18 @@ export default function App() {
     )
   }, [])
 
+  // Quick Inspiration selection: immediately prefills ingredients, energy mode, and recipe
+  const handleSelectQuickInspiration = useCallback((item: QuickInspiration) => {
+    setSelectedIngredientIds(item.stapleIds)
+    setCustomIngredients(item.customIngredients)
+    setEnergyMode(item.energyMode)
+    if (item.dietaryFilters) {
+      setDietaryFilters(item.dietaryFilters)
+    }
+    setRecipe(item.recipe)
+    setError(null)
+  }, [])
+
   // Generate / Spin recipe action
   const handleGenerateRecipe = useCallback(async () => {
     const stapleNames = INITIAL_PANTRY_INGREDIENTS.filter((item) =>
@@ -143,7 +153,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ingredients: allIngredients,
-          energy: energyMode,
+          energy: energyMode ?? 'cozy',
           dietary: dietaryFilters,
         }),
       })
@@ -166,6 +176,8 @@ export default function App() {
       setIsLoading(false)
     }
   }, [selectedIngredientIds, customIngredients, energyMode, dietaryFilters])
+
+  const totalIngredientsCount = selectedIngredientIds.length + customIngredients.length
 
   return (
     <div className="min-h-screen bg-cream-100 px-4 py-10 sm:px-6 sm:py-14 lg:px-8 text-stone-900 font-sans">
@@ -235,24 +247,57 @@ export default function App() {
             <SubmitButton
               onClick={handleGenerateRecipe}
               isLoading={isLoading}
-              disabled={isLoading}
+              disabled={isLoading || totalIngredientsCount === 0}
             />
           </section>
 
-          {/* Right Column (Recipe Display & Side Notes) */}
+          {/* Right Column (Recipe Display or Waiting Skillet Default) */}
           <section
             aria-label="Generated recipe and notes"
             className="space-y-6 lg:col-span-5 lg:sticky lg:top-8"
           >
-            {/* Tonight's Special Recipe Card */}
-            <RecipeCard
-              recipe={recipe}
-              isLoading={isLoading}
-              onRetry={handleGenerateRecipe}
-            />
+            {recipe ? (
+              <>
+                {/* Tonight's Special Recipe Card */}
+                <RecipeCard
+                  recipe={recipe}
+                  isLoading={isLoading}
+                  onRetry={handleGenerateRecipe}
+                />
 
-            {/* Culinary Side Notes & AI Disclaimer */}
-            <CulinaryNotes tip={recipe?.tip} />
+                {/* Quick Inspiration Switcher */}
+                <div className="rounded-3xl border border-surface-border bg-surface-card p-4 sm:p-5 shadow-xs">
+                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-brand mb-2.5">
+                    QUICK INSPIRATION
+                  </h3>
+                  <div className="grid grid-cols-1 gap-2">
+                    {QUICK_INSPIRATIONS.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleSelectQuickInspiration(item)}
+                        className="group flex items-center gap-3 rounded-xl border border-surface-border bg-cream-50/50 p-2.5 text-left transition-all duration-150 hover:bg-cream-100 hover:border-brand/40 cursor-pointer"
+                      >
+                        <span className="text-xl shrink-0">{item.emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs sm:text-sm font-bold text-stone-900 group-hover:text-brand transition-colors">
+                            {item.title}
+                          </div>
+                          <div className="text-[11px] text-stone-500 truncate">
+                            {item.subtitle}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Culinary Side Notes & AI Disclaimer */}
+                <CulinaryNotes tip={recipe.tip} />
+              </>
+            ) : (
+              <WaitingSkilletCard onSelectInspiration={handleSelectQuickInspiration} />
+            )}
           </section>
         </div>
       </main>
