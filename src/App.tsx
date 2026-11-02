@@ -77,6 +77,11 @@ export default function App() {
     )
   }, [])
 
+  // Clear all staple ingredients
+  const handleClearSelectedIngredients = useCallback(() => {
+    setSelectedIngredientIds([])
+  }, [])
+
   // Append custom ingredient string
   const handleAddCustomIngredient = useCallback((name: string) => {
     const trimmed = name.trim()
@@ -91,6 +96,11 @@ export default function App() {
   // Remove custom ingredient string
   const handleRemoveCustomIngredient = useCallback((name: string) => {
     setCustomIngredients((prev) => prev.filter((item) => item !== name))
+  }, [])
+
+  // Clear all custom ingredients
+  const handleClearCustomIngredients = useCallback(() => {
+    setCustomIngredients([])
   }, [])
 
   // Toggle dietary filter
@@ -198,6 +208,7 @@ export default function App() {
             <IngredientGrid
               selectedIds={selectedIngredientIds}
               onToggleIngredient={handleToggleIngredient}
+              onClearSelection={handleClearSelectedIngredients}
             />
 
             <hr className="border-surface-border" />
@@ -207,6 +218,7 @@ export default function App() {
               customIngredients={customIngredients}
               onAddIngredient={handleAddCustomIngredient}
               onRemoveIngredient={handleRemoveCustomIngredient}
+              onClearIngredients={handleClearCustomIngredients}
             />
 
             <hr className="border-surface-border" />

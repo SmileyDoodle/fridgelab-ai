@@ -1,5 +1,5 @@
-import { useState, type KeyboardEvent } from 'react'
-import { Plus, Search } from 'lucide-react'
+import { useRef, useState, type KeyboardEvent } from 'react'
+import { Plus, Search, X } from 'lucide-react'
 import { Pill, StepIndicator } from '../common/index.ts'
 
 export interface CustomIngredientInputProps {
@@ -9,6 +9,8 @@ export interface CustomIngredientInputProps {
   onAddIngredient: (name: string) => void
   /** Callback fired when an added ingredient is dismissed */
   onRemoveIngredient: (name: string) => void
+  /** Callback fired when all custom ingredients are cleared */
+  onClearIngredients?: () => void
   /** Placeholder text for the input */
   placeholder?: string
   /** Additional custom classes */
@@ -22,20 +24,26 @@ export function CustomIngredientInput({
   customIngredients,
   onAddIngredient,
   onRemoveIngredient,
+  onClearIngredients,
   placeholder = 'Type ingredient (e.g. Greek yogurt)',
   className = '',
 }: CustomIngredientInputProps) {
   const [inputValue, setInputValue] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const handleAdd = () => {
     const trimmed = inputValue.trim()
-    if (!trimmed) return
+    if (!trimmed) {
+      inputRef.current?.focus()
+      return
+    }
 
     // Avoid duplicate additions
     if (!customIngredients.some((ing) => ing.toLowerCase() === trimmed.toLowerCase())) {
       onAddIngredient(trimmed)
     }
     setInputValue('')
+    inputRef.current?.focus()
   }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -50,16 +58,29 @@ export function CustomIngredientInput({
       {/* Step 2 Header */}
       <div className="flex items-start gap-3">
         <StepIndicator step={2} />
-        <div>
+        <div className="flex-1 min-w-0">
           <h3
             id="step-2-heading"
             className="font-serif text-lg sm:text-xl font-bold text-stone-900 leading-tight"
           >
             Anything else in the fridge?
           </h3>
-          <p className="text-xs text-stone-500 mt-0.5">
-            Add half-jars of sauce, condiments, leftover herbs, or odd pantry items
-          </p>
+          <div className="mt-0.5 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs text-stone-500">
+              Add half-jars of sauce, leftover herbs, or odd pantry items
+            </p>
+            {/* Clear selection button */}
+            <button
+              type="button"
+              onClick={onClearIngredients}
+              disabled={customIngredients.length === 0}
+              aria-label={`Clear custom ingredients (${customIngredients.length})`}
+              className="inline-flex shrink-0 items-center gap-1 text-xs text-stone-400 hover:text-stone-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-stone-400 cursor-pointer"
+            >
+              <X className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>Clear selection ({customIngredients.length})</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -79,6 +100,7 @@ export function CustomIngredientInput({
 
         {/* Text input */}
         <input
+          ref={inputRef}
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
@@ -94,7 +116,7 @@ export function CustomIngredientInput({
           onClick={handleAdd}
           disabled={!inputValue.trim()}
           aria-label="Add ingredient to pantry"
-          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-cream-200 px-3 py-1.5 text-xs font-semibold text-stone-700 transition-colors hover:bg-cream-300 disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-cream-200 px-3 py-1.5 text-xs font-semibold text-stone-700 transition-colors hover:bg-cream-300 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-cream-200 disabled:hover:text-stone-700 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           <Plus className="h-3.5 w-3.5" aria-hidden="true" />
           <span>Add</span>
