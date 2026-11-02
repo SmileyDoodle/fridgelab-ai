@@ -2,7 +2,7 @@
  * Recipe & Pantry domain types for FridgeLab AI.
  */
 
-export type IngredientCategory = 'all' | 'dairy' | 'produce' | 'carbs'
+export type IngredientCategory = 'all' | 'dairy' | 'protein' | 'vegetables' | 'grains'
 
 export interface Ingredient {
   id: string
@@ -14,12 +14,9 @@ export interface Ingredient {
 
 export type EnergyMode = 'tired' | 'cozy' | 'hungry'
 
-export type DietaryFilter = 'vegetarian' | 'gluten-free' | 'high-protein'
-
 export interface Recipe {
   title: string
   cookingTime: string
-  technique: string
   ingredientsUsed: string[]
   steps: string[]
   tip: string
@@ -31,11 +28,5 @@ export interface EnergyModeOption {
   timingPill: string
   description: string
   sweetSpot?: boolean
-  emoji?: string
-}
-
-export interface DietaryFilterOption {
-  id: DietaryFilter
-  label: string
   emoji?: string
 }

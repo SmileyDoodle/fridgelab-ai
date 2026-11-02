@@ -1,5 +1,4 @@
 import type {
-  DietaryFilterOption,
   EnergyModeOption,
   Ingredient,
   IngredientCategory,
@@ -8,21 +7,21 @@ import type {
 
 /**
  * Initial pantry staples displayed in the 4-column selection grid.
- * Categorized into Dairy & Eggs, Produce, and Carbs.
+ * Categorized into Dairy & Eggs, Meat & Beans, Vegetables, and Grains & Bread.
  */
 export const INITIAL_PANTRY_INGREDIENTS: readonly Ingredient[] = [
   { id: 'egg', name: 'Egg', emoji: '🥚', category: 'dairy' },
   { id: 'cheese', name: 'Cheese', emoji: '🧀', category: 'dairy' },
-  { id: 'bread', name: 'Bread', emoji: '🍞', category: 'carbs' },
-  { id: 'tomato', name: 'Tomato', emoji: '🍅', category: 'produce' },
-  { id: 'potato', name: 'Potato', emoji: '🥔', category: 'produce' },
+  { id: 'bread', name: 'Bread', emoji: '🍞', category: 'grains' },
+  { id: 'tomato', name: 'Tomato', emoji: '🍅', category: 'vegetables' },
+  { id: 'potato', name: 'Potato', emoji: '🥔', category: 'vegetables' },
   { id: 'butter', name: 'Butter', emoji: '🧈', category: 'dairy' },
-  { id: 'rice', name: 'Rice', emoji: '🍚', category: 'carbs' },
-  { id: 'avocado', name: 'Avocado', emoji: '🥑', category: 'produce' },
-  { id: 'onion', name: 'Onion', emoji: '🧅', category: 'produce' },
-  { id: 'canned-beans', name: 'Canned Beans', emoji: '🥫', category: 'carbs' },
-  { id: 'milk', name: 'Milk', emoji: '🥛', category: 'dairy' },
-  { id: 'pasta', name: 'Pasta', emoji: '🍝', category: 'carbs' },
+  { id: 'rice', name: 'Rice', emoji: '🍚', category: 'grains' },
+  { id: 'avocado', name: 'Avocado', emoji: '🥑', category: 'vegetables' },
+  { id: 'onion', name: 'Onion', emoji: '🧅', category: 'vegetables' },
+  { id: 'canned-beans', name: 'Canned Beans', emoji: '🥫', category: 'protein' },
+  { id: 'bacon', name: 'Bacon', emoji: '🥓', category: 'protein' },
+  { id: 'pasta', name: 'Pasta', emoji: '🍝', category: 'grains' },
 ] as const
 
 /**
@@ -54,22 +53,14 @@ export const ENERGY_MODES: readonly EnergyModeOption[] = [
 ] as const
 
 /**
- * Dietary filter pill options displayed beneath energy mode selection.
- */
-export const DIETARY_FILTERS: readonly DietaryFilterOption[] = [
-  { id: 'vegetarian', label: 'Vegetarian', emoji: '🌱' },
-  { id: 'gluten-free', label: 'Gluten-Free', emoji: '🌾' },
-  { id: 'high-protein', label: 'High Protein', emoji: '💪' },
-] as const
-
-/**
  * Filter categories for the pantry shelf.
  */
 export const PANTRY_CATEGORIES: readonly { id: IngredientCategory; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'dairy', label: 'Dairy & Eggs' },
-  { id: 'produce', label: 'Produce' },
-  { id: 'carbs', label: 'Carbs' },
+  { id: 'protein', label: 'Meat & Beans' },
+  { id: 'vegetables', label: 'Vegetables' },
+  { id: 'grains', label: 'Grains & Bread' },
 ] as const
 
 /**
@@ -78,7 +69,6 @@ export const PANTRY_CATEGORIES: readonly { id: IngredientCategory; label: string
 export const INITIAL_RECIPE: Recipe = {
   title: 'Butter-Crisped Rice with Egg & Cheese',
   cookingTime: '12 mins',
-  technique: 'Cozy Skillet',
   ingredientsUsed: ['Butter', 'Rice', 'Eggs', 'Cheese', 'Chili Crisp'],
   steps: [
     'Melt butter in a skillet over medium-high heat until foaming and fragrant.',

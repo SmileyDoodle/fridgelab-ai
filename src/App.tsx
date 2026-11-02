@@ -18,7 +18,7 @@ import {
 } from './constants/quickInspirations.ts'
 import { findNonEdible } from './lib/data.ts'
 import { parseRecipe } from './lib/parseRecipe.ts'
-import type { DietaryFilter, EnergyMode, Recipe } from './types/recipe.ts'
+import type { EnergyMode, Recipe } from './types/recipe.ts'
 import { getFriendlyErrorMessage } from './utils/errorHandler.ts'
 
 /**
@@ -30,7 +30,6 @@ function parseApiResultToRecipe(raw: string, fallbackIngredients: string[]): Rec
     return {
       title: 'Cozy Skillet Dish',
       cookingTime: '15 mins',
-      technique: 'Cozy Stovetop',
       ingredientsUsed: fallbackIngredients,
       steps: [raw.replace(/^#+.*\n?/, '').trim()],
       tip: 'Season to taste with sea salt, freshly ground pepper, and gentle warmth.',
@@ -44,7 +43,6 @@ function parseApiResultToRecipe(raw: string, fallbackIngredients: string[]): Rec
   return {
     title: parsed.title || 'Cozy Pantry Dish',
     cookingTime: parsed.effort || '15 mins',
-    technique: 'Cozy Stovetop',
     ingredientsUsed: ingredientsList.length > 0 ? ingredientsList : fallbackIngredients,
     steps:
       parsed.steps.length > 0
@@ -61,7 +59,6 @@ export default function App() {
   const [selectedIngredientIds, setSelectedIngredientIds] = useState<string[]>([])
   const [customIngredients, setCustomIngredients] = useState<string[]>([])
   const [energyMode, setEnergyMode] = useState<EnergyMode | null>(null)
-  const [dietaryFilters, setDietaryFilters] = useState<DietaryFilter[]>([])
 
   // Default to null so "Your skillet is waiting" card shows by default
   const [recipe, setRecipe] = useState<Recipe | null>(null)
@@ -101,21 +98,11 @@ export default function App() {
     setCustomIngredients([])
   }, [])
 
-  // Toggle dietary filter
-  const handleToggleDietaryFilter = useCallback((filter: DietaryFilter) => {
-    setDietaryFilters((prev) =>
-      prev.includes(filter) ? prev.filter((item) => item !== filter) : [...prev, filter]
-    )
-  }, [])
-
   // Quick Inspiration selection: immediately prefills ingredients, energy mode, and recipe
   const handleSelectQuickInspiration = useCallback((item: QuickInspiration) => {
     setSelectedIngredientIds(item.stapleIds)
     setCustomIngredients(item.customIngredients)
     setEnergyMode(item.energyMode)
-    if (item.dietaryFilters) {
-      setDietaryFilters(item.dietaryFilters)
-    }
     setRecipe(item.recipe)
     setError(null)
   }, [])
@@ -154,7 +141,6 @@ export default function App() {
         body: JSON.stringify({
           ingredients: allIngredients,
           energy: energyMode ?? 'cozy',
-          dietary: dietaryFilters,
         }),
       })
 
@@ -175,7 +161,7 @@ export default function App() {
     } finally {
       setIsLoading(false)
     }
-  }, [selectedIngredientIds, customIngredients, energyMode, dietaryFilters])
+  }, [selectedIngredientIds, customIngredients, energyMode])
 
   const totalIngredientsCount = selectedIngredientIds.length + customIngredients.length
 
@@ -189,9 +175,8 @@ export default function App() {
         <p className="mt-1 font-serif text-2xl sm:text-3xl lg:text-4xl italic text-brand font-normal">
           will invent a cozy dish.
         </p>
-        <p className="mx-auto mt-4 max-w-lg text-center text-xs sm:text-sm text-stone-600 leading-relaxed">
-          Select whatever ingredients are on hand. Instant culinary combinations
-          computed straight in the browser with zero grocery runs.
+        <p className="mx-auto mt-4 max-w-xl text-center text-xs sm:text-sm text-stone-600 leading-relaxed">
+          Select your available ingredients and discover recipes you can make right now.
         </p>
       </header>
 
@@ -235,13 +220,8 @@ export default function App() {
 
             <hr className="border-surface-border" />
 
-            {/* Step 3: Energy Mode & Dietary Filters */}
-            <EnergySection
-              selectedMode={energyMode}
-              onSelectMode={setEnergyMode}
-              selectedDietaryFilters={dietaryFilters}
-              onToggleDietaryFilter={handleToggleDietaryFilter}
-            />
+            {/* Step 3: Energy Mode */}
+            <EnergySection selectedMode={energyMode} onSelectMode={setEnergyMode} />
 
             {/* Submit Action */}
             <SubmitButton

@@ -1,7 +1,15 @@
 import { useState } from 'react'
-import { Check, Clock, Copy, RefreshCw, Search } from 'lucide-react'
+import { Check, Clock, Copy, Leaf, MilkOff, RefreshCw, WheatOff } from 'lucide-react'
 import { Pill, StepIndicator } from '../common/index.ts'
+import { DIET_TAG_TEXT, getRecipeDietTags, type DietTag } from '../../utils/diet.ts'
 import type { Recipe } from '../../types/recipe.ts'
+
+const DIET_ICONS = {
+  vegan: Leaf,
+  vegetarian: Leaf,
+  'lactose-free': MilkOff,
+  'gluten-free': WheatOff,
+} satisfies Record<DietTag, unknown>
 
 export interface RecipeCardProps {
   /** The recipe to display */
@@ -25,12 +33,15 @@ export function RecipeCard({
   className = '',
 }: RecipeCardProps) {
   const [copied, setCopied] = useState(false)
+  const dietTags = getRecipeDietTags(recipe)
 
   const handleCopy = async () => {
     try {
       const formatted = [
         `🍳 ${recipe.title}`,
-        `⏱ Cooking Time: ${recipe.cookingTime} | Technique: ${recipe.technique}`,
+        dietTags.length > 0
+          ? `⏱ Cooking Time: ${recipe.cookingTime} | ${dietTags.map((t) => DIET_TAG_TEXT[t]).join(', ')}`
+          : `⏱ Cooking Time: ${recipe.cookingTime}`,
         '',
         `Ingredients Used: ${recipe.ingredientsUsed.join(', ')}`,
         '',
@@ -75,11 +86,17 @@ export function RecipeCard({
             icon={<Clock className="h-3.5 w-3.5 text-stone-500" aria-hidden="true" />}
             label={recipe.cookingTime}
           />
-          <Pill
-            variant="neutral"
-            icon={<Search className="h-3.5 w-3.5 text-stone-500" aria-hidden="true" />}
-            label={recipe.technique}
-          />
+          {dietTags.map((tag) => {
+            const DietIcon = DIET_ICONS[tag]
+            return (
+              <Pill
+                key={tag}
+                variant="neutral"
+                icon={<DietIcon className="h-3.5 w-3.5 text-stone-500" aria-hidden="true" />}
+                label={DIET_TAG_TEXT[tag]}
+              />
+            )
+          })}
         </div>
       </header>
 

@@ -1,4 +1,4 @@
-import type { DietaryFilter, EnergyMode, Recipe } from '../types/recipe.ts'
+import type { EnergyMode, Recipe } from '../types/recipe.ts'
 
 export interface QuickInspiration {
   id: string
@@ -8,7 +8,6 @@ export interface QuickInspiration {
   stapleIds: string[]
   customIngredients: string[]
   energyMode: EnergyMode
-  dietaryFilters?: DietaryFilter[]
   recipe: Recipe
 }
 
@@ -26,11 +25,9 @@ export const QUICK_INSPIRATIONS: readonly QuickInspiration[] = [
     stapleIds: ['egg', 'bread', 'butter'],
     customIngredients: [],
     energyMode: 'tired',
-    dietaryFilters: ['vegetarian'],
     recipe: {
       title: 'Golden Butter Toast with Jammy Skillet Eggs',
       cookingTime: '7 mins',
-      technique: 'Cozy Stovetop',
       ingredientsUsed: ['Egg', 'Bread', 'Butter'],
       steps: [
         'Melt generous butter in a heavy skillet over medium heat until gently foaming.',
@@ -49,11 +46,9 @@ export const QUICK_INSPIRATIONS: readonly QuickInspiration[] = [
     stapleIds: ['rice', 'egg'],
     customIngredients: ['Garlic', 'Soy Sauce'],
     energyMode: 'cozy',
-    dietaryFilters: ['vegetarian'],
     recipe: {
       title: 'Sizzling Garlic Soy Butter Rice Bowl',
       cookingTime: '5 mins',
-      technique: 'Single Skillet',
       ingredientsUsed: ['Rice', 'Egg', 'Garlic', 'Soy Sauce'],
       steps: [
         'Heat a slick of butter or oil in a skillet and sizzle minced garlic for 30 seconds until fragrant.',
@@ -72,11 +67,9 @@ export const QUICK_INSPIRATIONS: readonly QuickInspiration[] = [
     stapleIds: ['pasta', 'tomato', 'cheese'],
     customIngredients: [],
     energyMode: 'cozy',
-    dietaryFilters: [],
     recipe: {
       title: 'Blistered Tomato & Melted Cheese Skillet Pasta',
       cookingTime: '12 mins',
-      technique: 'One-Pan Skillet',
       ingredientsUsed: ['Pasta', 'Tomato', 'Cheese'],
       steps: [
         'Cook pasta in salted boiling water until al dente, reserving a small cup of starchy cooking water.',

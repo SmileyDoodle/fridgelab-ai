@@ -11,7 +11,7 @@ export const FOOD_EMOJIS = [
   { emoji: '🥑', name: 'Avocado' },
   { emoji: '🧅', name: 'Onion' },
   { emoji: '🥫', name: 'Beans' },
-  { emoji: '🥛', name: 'Milk' },
+  { emoji: '🥓', name: 'Bacon' },
   { emoji: '🍝', name: 'Pasta' },
 ] as const
 
