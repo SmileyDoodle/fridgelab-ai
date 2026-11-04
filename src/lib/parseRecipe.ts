@@ -1,4 +1,4 @@
-import { DIETARY_TAGS, type DietaryTag } from '../types/recipe.ts'
+import { DIETARY_TAGS, type DietaryTag, type Recipe } from '../types/recipe.ts'
 
 export interface ParsedRecipe {
   title: string
@@ -53,3 +53,38 @@ export function parseRecipe(raw: string): ParsedRecipe | null {
   }
   return recipe
 }
+
+/**
+ * Transforms edge API markdown result into structured Recipe interface.
+ * Returns null if the markdown indicates non-food or cannot be parsed into a real recipe.
+ */
+export function parseApiResultToRecipe(raw: string, fallbackIngredients: string[]): Recipe | null {
+  const upper = raw.toUpperCase()
+  if (
+    upper.includes('NOT_FOOD') ||
+    /not\s+(an?\s+)?(edible|food|typical\s+pantry)/i.test(raw)
+  ) {
+    return null
+  }
+
+  const parsed = parseRecipe(raw)
+  if (!parsed || !parsed.title || parsed.steps.length === 0) {
+    return null
+  }
+
+  const ingredientsList = parsed.ingredients
+    ? parsed.ingredients.split(',').map((s) => s.trim()).filter(Boolean)
+    : fallbackIngredients
+
+  return {
+    title: parsed.title,
+    cookingTime: parsed.effort || '15 mins',
+    dietary: parsed.dietary,
+    ingredientsUsed: ingredientsList.length > 0 ? ingredientsList : fallbackIngredients,
+    steps: parsed.steps,
+    tip:
+      parsed.tip ||
+      'Cold day-old rice crisps twice as fast as freshly steamed rice because starch molecules retrograde in the fridge.',
+  }
+}
+
