@@ -2,14 +2,11 @@
  * Recipe & Pantry domain types for FridgeLab AI.
  */
 
-export type IngredientCategory = 'all' | 'dairy' | 'protein' | 'vegetables' | 'grains'
-
 export interface Ingredient {
   id: string
   name: string
   emoji: string
   icon?: string
-  category: IngredientCategory
 }
 
 export type EnergyMode = 'tired' | 'cozy' | 'hungry'

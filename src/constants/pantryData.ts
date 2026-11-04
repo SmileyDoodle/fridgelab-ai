@@ -1,27 +1,25 @@
 import type {
   EnergyModeOption,
   Ingredient,
-  IngredientCategory,
   Recipe,
 } from '../types/recipe.ts'
 
 /**
  * Initial pantry staples displayed in the 4-column selection grid.
- * Categorized into Dairy & Eggs, Meat & Beans, Vegetables, and Grains & Bread.
  */
 export const INITIAL_PANTRY_INGREDIENTS: readonly Ingredient[] = [
-  { id: 'egg', name: 'Egg', emoji: '🥚', category: 'dairy' },
-  { id: 'cheese', name: 'Cheese', emoji: '🧀', category: 'dairy' },
-  { id: 'bread', name: 'Bread', emoji: '🍞', category: 'grains' },
-  { id: 'tomato', name: 'Tomato', emoji: '🍅', category: 'vegetables' },
-  { id: 'potato', name: 'Potato', emoji: '🥔', category: 'vegetables' },
-  { id: 'lettuce', name: 'Lettuce', emoji: '🥬', category: 'vegetables' },
-  { id: 'rice', name: 'Rice', emoji: '🍚', category: 'grains' },
-  { id: 'avocado', name: 'Avocado', emoji: '🥑', category: 'vegetables' },
-  { id: 'onion', name: 'Onion', emoji: '🧅', category: 'vegetables' },
-  { id: 'canned-beans', name: 'Canned Beans', emoji: '🥫', category: 'protein' },
-  { id: 'bacon', name: 'Bacon', emoji: '🥓', category: 'protein' },
-  { id: 'pasta', name: 'Pasta', emoji: '🍝', category: 'grains' },
+  { id: 'egg', name: 'Egg', emoji: '🥚' },
+  { id: 'cheese', name: 'Cheese', emoji: '🧀' },
+  { id: 'bread', name: 'Bread', emoji: '🍞' },
+  { id: 'tomato', name: 'Tomato', emoji: '🍅' },
+  { id: 'potato', name: 'Potato', emoji: '🥔' },
+  { id: 'lettuce', name: 'Lettuce', emoji: '🥬' },
+  { id: 'rice', name: 'Rice', emoji: '🍚' },
+  { id: 'avocado', name: 'Avocado', emoji: '🥑' },
+  { id: 'onion', name: 'Onion', emoji: '🧅' },
+  { id: 'canned-beans', name: 'Canned Beans', emoji: '🥫' },
+  { id: 'bacon', name: 'Bacon', emoji: '🥓' },
+  { id: 'pasta', name: 'Pasta', emoji: '🍝' },
 ] as const
 
 /**
@@ -52,16 +50,6 @@ export const ENERGY_MODES: readonly EnergyModeOption[] = [
   },
 ] as const
 
-/**
- * Filter categories for the pantry shelf.
- */
-export const PANTRY_CATEGORIES: readonly { id: IngredientCategory; label: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'dairy', label: 'Dairy & Eggs' },
-  { id: 'protein', label: 'Meat & Beans' },
-  { id: 'vegetables', label: 'Vegetables' },
-  { id: 'grains', label: 'Grains & Bread' },
-] as const
 
 /**
  * Default demonstration recipe matching the warm editorial design.
