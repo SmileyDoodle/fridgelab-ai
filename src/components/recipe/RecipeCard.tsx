@@ -1,15 +1,16 @@
 import { useState } from 'react'
-import { Check, Clock, Copy, Leaf, MilkOff, RefreshCw, WheatOff } from 'lucide-react'
+import { Check, Clock, Copy, EggOff, Leaf, MilkOff, NutOff, RefreshCw, WheatOff } from 'lucide-react'
 import { Pill, StepIndicator } from '../common/index.ts'
-import { DIET_TAG_TEXT, getRecipeDietTags, type DietTag } from '../../utils/diet.ts'
-import type { Recipe } from '../../types/recipe.ts'
+import type { DietaryTag, Recipe } from '../../types/recipe.ts'
 
 const DIET_ICONS = {
-  vegan: Leaf,
-  vegetarian: Leaf,
-  'lactose-free': MilkOff,
-  'gluten-free': WheatOff,
-} satisfies Record<DietTag, unknown>
+  Vegan: Leaf,
+  Vegetarian: Leaf,
+  'Dairy-free': MilkOff,
+  'Gluten-free': WheatOff,
+  'Egg-free': EggOff,
+  'Nut-free': NutOff,
+} satisfies Record<DietaryTag, unknown>
 
 export interface RecipeCardProps {
   /** The recipe to display */
@@ -33,14 +34,14 @@ export function RecipeCard({
   className = '',
 }: RecipeCardProps) {
   const [copied, setCopied] = useState(false)
-  const dietTags = getRecipeDietTags(recipe)
+  const dietTags = recipe.dietary
 
   const handleCopy = async () => {
     try {
       const formatted = [
         `🍳 ${recipe.title}`,
         dietTags.length > 0
-          ? `⏱ Cooking Time: ${recipe.cookingTime} | ${dietTags.map((t) => DIET_TAG_TEXT[t]).join(', ')}`
+          ? `⏱ Cooking Time: ${recipe.cookingTime} | ${dietTags.join(', ')}`
           : `⏱ Cooking Time: ${recipe.cookingTime}`,
         '',
         `Ingredients Used: ${recipe.ingredientsUsed.join(', ')}`,
@@ -93,7 +94,7 @@ export function RecipeCard({
                 key={tag}
                 variant="neutral"
                 icon={<DietIcon className="h-3.5 w-3.5 text-stone-500" aria-hidden="true" />}
-                label={DIET_TAG_TEXT[tag]}
+                label={tag}
               />
             )
           })}

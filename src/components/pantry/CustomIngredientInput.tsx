@@ -32,11 +32,14 @@ export function CustomIngredientInput({
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleAdd = () => {
-    const trimmed = inputValue.trim()
-    if (!trimmed) {
+    // Sanitize: strip control characters/HTML-like syntax and limit length
+    const cleaned = inputValue.replace(/[^\p{L}\p{N}\s\-'’,]/gu, '').trim()
+    if (!cleaned) {
       inputRef.current?.focus()
       return
     }
+
+    const trimmed = cleaned.slice(0, 40)
 
     // Avoid duplicate additions
     if (!customIngredients.some((ing) => ing.toLowerCase() === trimmed.toLowerCase())) {
@@ -102,6 +105,7 @@ export function CustomIngredientInput({
         <input
           ref={inputRef}
           type="text"
+          maxLength={40}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}

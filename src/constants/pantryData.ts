@@ -31,7 +31,7 @@ export const ENERGY_MODES: readonly EnergyModeOption[] = [
   {
     id: 'tired',
     title: 'Tired / Low-Effort',
-    timingPill: '< 8 min',
+    timingPill: '5 min',
     description: 'Microwave, toaster, or 1 mug. Zero fuss.',
     emoji: '🥱',
   },
@@ -46,7 +46,7 @@ export const ENERGY_MODES: readonly EnergyModeOption[] = [
   {
     id: 'hungry',
     title: 'Hungry Chef Mode',
-    timingPill: '30+ min',
+    timingPill: '25+ min',
     description: 'Crisping, deglazing, creative pan sauces.',
     emoji: '👨‍🍳',
   },
@@ -69,6 +69,7 @@ export const PANTRY_CATEGORIES: readonly { id: IngredientCategory; label: string
 export const INITIAL_RECIPE: Recipe = {
   title: 'Butter-Crisped Rice with Egg & Cheese',
   cookingTime: '12 mins',
+  dietary: ['Vegetarian'],
   ingredientsUsed: ['Butter', 'Rice', 'Eggs', 'Cheese', 'Chili Crisp'],
   steps: [
     'Melt butter in a skillet over medium-high heat until foaming and fragrant.',

@@ -9,6 +9,8 @@ export const FRIENDLY_ERROR_MESSAGES = {
   parse: "We had trouble plating this recipe. Let's try another spin!",
   invalidInput: 'Please select between 1 and 12 ingredients to create a recipe.',
   inedible: 'Some of those items do not seem like kitchen staples. Try picking tasty pantry ingredients!',
+  noSafeRecipe:
+    "We couldn't find a safe, tasty way to combine those ingredients. Try adding or swapping an ingredient and spin again!",
   fallback: 'Something unexpected simmered up. Please try again in a moment.',
 } as const
 
@@ -47,6 +49,11 @@ export function getFriendlyErrorMessage(error: unknown): string {
   }
 
   const normalized = message.toLowerCase()
+
+  // 0. AI could not build a safe dish from the (edible) ingredients
+  if (normalized.includes('no_safe_recipe')) {
+    return FRIENDLY_ERROR_MESSAGES.noSafeRecipe
+  }
 
   // 1. Inedible ingredient guardrail triggered
   if (normalized.includes('not_food') || normalized.includes('not food') || normalized.includes('inedible')) {

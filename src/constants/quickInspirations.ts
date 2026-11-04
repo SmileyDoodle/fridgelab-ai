@@ -28,6 +28,7 @@ export const QUICK_INSPIRATIONS: readonly QuickInspiration[] = [
     recipe: {
       title: 'Golden Butter Toast with Jammy Skillet Eggs',
       cookingTime: '7 mins',
+      dietary: ['Vegetarian', 'Nut-free'],
       ingredientsUsed: ['Egg', 'Bread', 'Butter'],
       steps: [
         'Melt generous butter in a heavy skillet over medium heat until gently foaming.',
@@ -49,6 +50,7 @@ export const QUICK_INSPIRATIONS: readonly QuickInspiration[] = [
     recipe: {
       title: 'Sizzling Garlic Soy Butter Rice Bowl',
       cookingTime: '5 mins',
+      dietary: ['Vegetarian', 'Nut-free'],
       ingredientsUsed: ['Rice', 'Egg', 'Garlic', 'Soy Sauce'],
       steps: [
         'Heat a slick of butter or oil in a skillet and sizzle minced garlic for 30 seconds until fragrant.',
@@ -70,6 +72,7 @@ export const QUICK_INSPIRATIONS: readonly QuickInspiration[] = [
     recipe: {
       title: 'Blistered Tomato & Melted Cheese Skillet Pasta',
       cookingTime: '12 mins',
+      dietary: ['Vegetarian', 'Nut-free'],
       ingredientsUsed: ['Pasta', 'Tomato', 'Cheese'],
       steps: [
         'Cook pasta in salted boiling water until al dente, reserving a small cup of starchy cooking water.',

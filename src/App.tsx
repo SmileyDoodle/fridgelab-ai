@@ -16,24 +16,26 @@ import {
   QUICK_INSPIRATIONS,
   type QuickInspiration,
 } from './constants/quickInspirations.ts'
-import { findNonEdible } from './lib/data.ts'
 import { parseRecipe } from './lib/parseRecipe.ts'
 import type { EnergyMode, Recipe } from './types/recipe.ts'
 import { getFriendlyErrorMessage } from './utils/errorHandler.ts'
 
 /**
  * Transforms edge API markdown result into structured Recipe interface.
+ * Returns null if the markdown indicates non-food or cannot be parsed into a real recipe.
  */
-function parseApiResultToRecipe(raw: string, fallbackIngredients: string[]): Recipe {
+function parseApiResultToRecipe(raw: string, fallbackIngredients: string[]): Recipe | null {
+  const upper = raw.toUpperCase()
+  if (
+    upper.includes('NOT_FOOD') ||
+    /not\s+(an?\s+)?(edible|food|typical\s+pantry)/i.test(raw)
+  ) {
+    return null
+  }
+
   const parsed = parseRecipe(raw)
-  if (!parsed) {
-    return {
-      title: 'Cozy Skillet Dish',
-      cookingTime: '15 mins',
-      ingredientsUsed: fallbackIngredients,
-      steps: [raw.replace(/^#+.*\n?/, '').trim()],
-      tip: 'Season to taste with sea salt, freshly ground pepper, and gentle warmth.',
-    }
+  if (!parsed || !parsed.title || parsed.steps.length === 0) {
+    return null
   }
 
   const ingredientsList = parsed.ingredients
@@ -41,13 +43,11 @@ function parseApiResultToRecipe(raw: string, fallbackIngredients: string[]): Rec
     : fallbackIngredients
 
   return {
-    title: parsed.title || 'Cozy Pantry Dish',
+    title: parsed.title,
     cookingTime: parsed.effort || '15 mins',
+    dietary: parsed.dietary,
     ingredientsUsed: ingredientsList.length > 0 ? ingredientsList : fallbackIngredients,
-    steps:
-      parsed.steps.length > 0
-        ? parsed.steps
-        : ['Combine and warm ingredients in a skillet until fragrant and golden.'],
+    steps: parsed.steps,
     tip:
       parsed.tip ||
       'Cold day-old rice crisps twice as fast as freshly steamed rice because starch molecules retrograde in the fridge.',
@@ -116,18 +116,14 @@ export default function App() {
     const allIngredients = [...stapleNames, ...customIngredients]
 
     if (allIngredients.length === 0) {
+      setRecipe(null)
       setError('Please select between 1 and 12 ingredients.')
       return
     }
 
     if (allIngredients.length > 12) {
+      setRecipe(null)
       setError('Please select between 1 and 12 ingredients.')
-      return
-    }
-
-    // Client-side inedible check guardrail
-    if (findNonEdible(allIngredients)) {
-      setError('NOT_FOOD')
       return
     }
 
@@ -147,16 +143,38 @@ export default function App() {
       const data = await res.json()
 
       if (!res.ok) {
+        setRecipe(null)
         throw new Error(data.error || `Server error (${res.status})`)
       }
 
       if (data.result) {
+        const rawUpper = data.result.toUpperCase()
+        if (rawUpper.includes('NO_SAFE_RECIPE')) {
+          setRecipe(null)
+          setError('NO_SAFE_RECIPE')
+          return
+        }
+        if (
+          rawUpper.includes('NOT_FOOD') ||
+          /not\s+(an?\s+)?(edible|food|typical\s+pantry)/i.test(data.result)
+        ) {
+          setRecipe(null)
+          setError('NOT_FOOD')
+          return
+        }
+
         const nextRecipe = parseApiResultToRecipe(data.result, allIngredients)
+        if (!nextRecipe) {
+          setRecipe(null)
+          throw new Error('parse')
+        }
         setRecipe(nextRecipe)
       } else {
+        setRecipe(null)
         throw new Error('No recipe was returned from the kitchen.')
       }
     } catch (err: unknown) {
+      setRecipe(null)
       setError(err)
     } finally {
       setIsLoading(false)
