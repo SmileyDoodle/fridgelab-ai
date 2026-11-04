@@ -86,12 +86,25 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           If the listed ingredients cannot be combined into a safe, edible dish, reply with ONLY this exact text and nothing else:
           NO_SAFE_RECIPE
 
-          STEP 3: OUTPUT FORMAT
+          STEP 3: DIETARY CHECK (required, do this before writing anything)
+          Choose a dish that uses the listed ingredients. Then go through every ingredient in the finished dish one by one, including bread, tortillas, pasta, flour, crackers, soy sauce, broth, stock, sauces, and seasonings. Do not judge the dish by its main ingredients alone.
+
+          Apply these rules:
+          - Vegetarian: no meat, poultry, fish, shellfish, or products made from them (for example bacon, ham, anchovies, gelatin, meat or fish stock, Worcestershire sauce).
+          - Vegan: vegetarian, and no eggs, dairy, honey, or other animal products.
+          - Gluten-free: no wheat, barley, rye, oats (unless labeled gluten-free), semolina, spelt, or products made from them (for example bread, pasta, flour, couscous, breadcrumbs, soy sauce, most beer, many stocks and sauces).
+          - Dairy-free: no milk, cheese, butter, cream, yogurt, ghee, or whey.
+          - Egg-free: no eggs and no products made with eggs (for example most fresh pasta, mayonnaise, many baked goods).
+          - Nut-free: no tree nuts, peanuts, nut oils, nut butters, or nut-based milks.
+
+          Add a tag only if every ingredient clearly meets its rule. If any ingredient breaks a rule, or you are not sure, leave the tag out.
+
+          STEP 4: OUTPUT FORMAT
           Format strictly in clean Markdown, with no text before or after:
 
           ### [Dish Name]
           - **Effort:** [e.g. 15 min, scaled to the energy level: less effort for low energy]
-          - **Dietary:** [Only tags from this fixed list that the finished dish clearly satisfies: Vegetarian, Vegan, Gluten-free, Dairy-free, Egg-free, Nut-free. Separate tags with commas. Leave out any tag you are not certain about. Assume common store-bought sauces and broths may contain gluten, dairy, eggs, or fish products.]
+          - **Dietary:** [Only the tags that passed the Step 3 dietary check, chosen from: Vegetarian, Vegan, Gluten-free, Dairy-free, Egg-free, Nut-free. Separate tags with commas. If none pass, write "None".]
           - **Ingredients Used:** [Only items from the pantry list, plus the basic staples if needed. Do not add quantities. Use what is on hand and aim to use up leftovers.]
           - **Steps:**
           1. [Step 1]
