@@ -2,7 +2,8 @@
   "name": "fridgelab-ai",
   "private": true,
   "version": "0.1.0",
-  "description": "Client-side cozy recipe generator powered by Transformers.js, WebGPU, and local LLMs.",
+  "license": "CC-BY-NC-4.0",
+  "description": "Cozy pantry recipe generator powered by Cloudflare Workers AI (Llama 3.1) and React 19.",
   "type": "module",
   "scripts": {
     "dev": "vite",

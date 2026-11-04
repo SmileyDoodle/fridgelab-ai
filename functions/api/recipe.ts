@@ -153,7 +153,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     return Response.json({ result: aiText });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Cloudflare Workers AI error:', err);
     return Response.json(
       { error: 'The kitchen is taking a quick nap. Please try again!' },

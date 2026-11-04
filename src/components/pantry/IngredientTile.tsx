@@ -27,9 +27,8 @@ export function IngredientTile({
   return (
     <button
       type="button"
-      role="button"
       aria-pressed={selected}
-      aria-label={`${ingredient.name}${selected ? ' (selected)' : ''}`}
+      aria-label={ingredient.name}
       onClick={handleClick}
       disabled={disabled}
       className={`group relative flex flex-col items-center justify-center rounded-2xl border p-3 sm:p-4 text-center transition-all duration-150 select-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
