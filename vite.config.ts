@@ -55,8 +55,13 @@ function devApiRecipePlugin(): Plugin {
   }
 }
 
+import pkg from './package.json' with { type: 'json' }
+
 export default defineConfig({
   plugins: [react(), tailwindcss(), devApiRecipePlugin()],
   build: { target: 'esnext' },
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
 })
 

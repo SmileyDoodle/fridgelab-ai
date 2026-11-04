@@ -68,9 +68,9 @@ export function CustomIngredientInput({
           >
             Anything else in the fridge?
           </h3>
-          <div className="mt-0.5 flex flex-wrap items-center justify-between gap-2">
-            <p className="text-xs text-stone-500">
-              Add half-jars of sauce, leftover herbs, or odd pantry items
+          <div className="mt-0.5 flex items-center justify-between gap-3">
+            <p className="text-xs text-stone-500 flex-1 min-w-0">
+              Add half-jars of sauce, leftover herbs, or odd pantry items. Basic staples like salt and cooking oil may be omitted.
             </p>
             {/* Clear selection button */}
             <button

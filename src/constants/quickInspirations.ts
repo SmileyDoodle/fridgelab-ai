@@ -22,8 +22,8 @@ export const QUICK_INSPIRATIONS: readonly QuickInspiration[] = [
     title: 'Late-Night Comfort',
     subtitle: 'Egg + Bread + Butter',
     emoji: '🍳',
-    stapleIds: ['egg', 'bread', 'butter'],
-    customIngredients: [],
+    stapleIds: ['egg', 'bread'],
+    customIngredients: ['Butter'],
     energyMode: 'tired',
     recipe: {
       title: 'Golden Butter Toast with Jammy Skillet Eggs',

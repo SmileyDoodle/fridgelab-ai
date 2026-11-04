@@ -12,6 +12,12 @@ type PagesFunction<T = unknown> = (context: {
   waitUntil?: (promise: Promise<unknown>) => void;
 }) => Promise<Response>;
 
+const ENERGY_PROMPTS: Record<string, string> = {
+  tired: 'Tired (~5 min, quick & minimal effort)',
+  cozy: 'Cozy (~15 min, simple stovetop)',
+  hungry: 'Hungry (25+ min, unhurried & creative)',
+};
+
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const { request, env } = context;
@@ -58,8 +64,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         ? body.energy
         : typeof body.vibe === 'string'
           ? body.vibe
-          : 'Cozy';
-    const energy = rawEnergy.replace(/[^\p{L}\p{N}\s-]/gu, '').trim().slice(0, 30) || 'Cozy';
+          : 'cozy';
+    const energy = rawEnergy.replace(/[^\p{L}\p{N}\s-]/gu, '').trim().slice(0, 30) || 'cozy';
+    const energyDescription = ENERGY_PROMPTS[energy.toLowerCase()] || energy;
 
     // Call Cloudflare's serverless AI at the edge
     const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fp8', {
@@ -104,7 +111,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         },
         {
           role: 'user',
-          content: `Ingredients: ${sanitizedIngredients.join(', ')}. Energy level: ${energy}`,
+          content: `Ingredients: ${sanitizedIngredients.join(', ')}. Energy level: ${energyDescription}`,
         },
       ],
       max_tokens: 450,

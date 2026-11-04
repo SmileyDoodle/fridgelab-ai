@@ -302,7 +302,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="mt-16 text-center text-xs text-stone-500 font-sans tracking-tight">
-        FridgeLab AI v0.1.0 · 2026 · All rights reserved.
+        FridgeLab AI v{__APP_VERSION__} · {new Date().getFullYear()} · All rights reserved.
       </footer>
     </div>
   )

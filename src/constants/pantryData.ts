@@ -15,7 +15,7 @@ export const INITIAL_PANTRY_INGREDIENTS: readonly Ingredient[] = [
   { id: 'bread', name: 'Bread', emoji: '🍞', category: 'grains' },
   { id: 'tomato', name: 'Tomato', emoji: '🍅', category: 'vegetables' },
   { id: 'potato', name: 'Potato', emoji: '🥔', category: 'vegetables' },
-  { id: 'butter', name: 'Butter', emoji: '🧈', category: 'dairy' },
+  { id: 'lettuce', name: 'Lettuce', emoji: '🥬', category: 'vegetables' },
   { id: 'rice', name: 'Rice', emoji: '🍚', category: 'grains' },
   { id: 'avocado', name: 'Avocado', emoji: '🥑', category: 'vegetables' },
   { id: 'onion', name: 'Onion', emoji: '🧅', category: 'vegetables' },
