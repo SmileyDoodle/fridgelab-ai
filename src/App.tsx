@@ -58,7 +58,7 @@ export default function App() {
   // Default clean state: nothing selected on the left side (1-3)
   const [selectedIngredientIds, setSelectedIngredientIds] = useState<string[]>([])
   const [customIngredients, setCustomIngredients] = useState<string[]>([])
-  const [energyMode, setEnergyMode] = useState<EnergyMode | null>(null)
+  const [energyMode, setEnergyMode] = useState<EnergyMode | null>('cozy')
 
   // Default to null so "Your skillet is waiting" card shows by default
   const [recipe, setRecipe] = useState<Recipe | null>(null)
@@ -115,15 +115,9 @@ export default function App() {
 
     const allIngredients = [...stapleNames, ...customIngredients]
 
-    if (allIngredients.length === 0) {
+    if (allIngredients.length < 2 || allIngredients.length > 12) {
       setRecipe(null)
-      setError('Please select between 1 and 12 ingredients.')
-      return
-    }
-
-    if (allIngredients.length > 12) {
-      setRecipe(null)
-      setError('Please select between 1 and 12 ingredients.')
+      setError('Please select between 2 and 12 ingredients.')
       return
     }
 
@@ -245,7 +239,7 @@ export default function App() {
             <SubmitButton
               onClick={handleGenerateRecipe}
               isLoading={isLoading}
-              disabled={isLoading || totalIngredientsCount === 0}
+              disabled={isLoading || totalIngredientsCount < 2}
             />
           </section>
 
@@ -294,7 +288,10 @@ export default function App() {
                 <CulinaryNotes tip={recipe.tip} />
               </>
             ) : (
-              <WaitingSkilletCard onSelectInspiration={handleSelectQuickInspiration} />
+              <WaitingSkilletCard
+                onSelectInspiration={handleSelectQuickInspiration}
+                isLoading={isLoading}
+              />
             )}
           </section>
         </div>

@@ -20,10 +20,10 @@ function devApiRecipePlugin(): Plugin {
             try {
               const body = JSON.parse(rawBody || '{}')
               const { ingredients = [], energy = 'Cozy' } = body
-              if (!Array.isArray(ingredients) || ingredients.length === 0 || ingredients.length > 12) {
+              if (!Array.isArray(ingredients) || ingredients.length < 2 || ingredients.length > 12) {
                 res.statusCode = 400
                 res.setHeader('Content-Type', 'application/json')
-                res.end(JSON.stringify({ error: 'Please select between 1 and 12 ingredients.' }))
+                res.end(JSON.stringify({ error: 'Please select between 2 and 12 ingredients.' }))
                 return
               }
 

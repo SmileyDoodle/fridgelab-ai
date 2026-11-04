@@ -2,6 +2,8 @@ import { QUICK_INSPIRATIONS, type QuickInspiration } from '../../constants/quick
 
 export interface WaitingSkilletCardProps {
   onSelectInspiration: (inspiration: QuickInspiration) => void
+  /** When true, shows an animated "cooking" state instead of the idle one */
+  isLoading?: boolean
   className?: string
 }
 
@@ -11,8 +13,52 @@ export interface WaitingSkilletCardProps {
  */
 export function WaitingSkilletCard({
   onSelectInspiration,
+  isLoading = false,
   className = '',
 }: WaitingSkilletCardProps) {
+  if (isLoading) {
+    return (
+      <article
+        aria-label="Cooking your recipe"
+        aria-live="polite"
+        className={`overflow-hidden rounded-3xl border border-surface-border bg-surface-card shadow-xs ${className}`}
+      >
+        <div className="p-8 sm:p-10 text-center">
+          <div className="relative mx-auto flex h-24 w-24 items-end justify-center">
+            {[0, 0.5, 1].map((delay, i) => (
+              <span
+                key={i}
+                aria-hidden="true"
+                className="steam-puff absolute top-0 h-5 w-2 rounded-full bg-stone-300/70 blur-[2px]"
+                style={{
+                  left: `${30 + i * 20}%`,
+                  animation: `steam 1.8s ease-out ${delay}s infinite`,
+                }}
+              />
+            ))}
+            <span
+              className="cooking-skillet text-6xl"
+              style={{ animation: 'bob 1.2s ease-in-out infinite' }}
+              role="img"
+              aria-label="Cooking skillet"
+            >
+              🍳
+            </span>
+          </div>
+          <h2 className="mt-4 font-serif text-2xl sm:text-3xl font-bold text-stone-900 leading-tight">
+            Your dish is cooking…
+          </h2>
+          <p className="mx-auto mt-2 max-w-sm text-xs sm:text-sm text-stone-600 leading-relaxed">
+            FridgeLab AI is simmering up something cozy from your ingredients. Just a moment!
+          </p>
+          <div className="mx-auto mt-5 h-2 w-48 overflow-hidden rounded-full bg-cream-200">
+            <div className="progress-stripes h-full w-full rounded-full bg-brand" />
+          </div>
+        </div>
+      </article>
+    )
+  }
+
   return (
     <article
       aria-label="Your skillet is waiting"

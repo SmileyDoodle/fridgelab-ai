@@ -29,9 +29,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const { ingredients } = body;
 
     // Safety guardrail: reject non-array, empty, or excessive ingredient count
-    if (!Array.isArray(ingredients) || ingredients.length === 0 || ingredients.length > 12) {
+    if (!Array.isArray(ingredients) || ingredients.length < 2 || ingredients.length > 12) {
       return Response.json(
-        { error: 'Please select between 1 and 12 ingredients.' },
+        { error: 'Please select between 2 and 12 ingredients.' },
         { status: 400 }
       );
     }

@@ -7,7 +7,7 @@ export const FRIENDLY_ERROR_MESSAGES = {
   rateLimit: 'The kitchen is buzzing with too many orders right now. Please wait a moment and try again.',
   server: 'The kitchen is taking a quick nap. Please give it a moment and try again!',
   parse: "We had trouble plating this recipe. Let's try another spin!",
-  invalidInput: 'Please select between 1 and 12 ingredients to create a recipe.',
+  invalidInput: 'Please select between 2 and 12 ingredients to create a recipe. We’re all about making the most of what you already have, with simple, quick meals and no complicated ingredient lists.',
   inedible: 'Some of those items do not seem like kitchen staples. Try picking tasty pantry ingredients!',
   noSafeRecipe:
     "We couldn't find a safe, tasty way to combine those ingredients. Try adding or swapping an ingredient and spin again!",
@@ -62,6 +62,7 @@ export function getFriendlyErrorMessage(error: unknown): string {
 
   // 2. Client-side input validation
   if (
+    normalized.includes('between 2 and 12') ||
     normalized.includes('between 1 and 12') ||
     normalized.includes('select between') ||
     (status === 400 && normalized.includes('ingredient'))

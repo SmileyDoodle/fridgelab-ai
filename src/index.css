@@ -65,6 +65,14 @@
   from { transform: translateY(16px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+@keyframes steam {
+  0% { transform: translateY(8px) scaleX(1); opacity: 0; }
+  30% { opacity: 0.8; }
+  100% { transform: translateY(-26px) scaleX(1.4); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .steam-puff, .cooking-skillet { animation: none !important; }
+}
 @keyframes stripes {
   from { background-position: 0 0; }
   to { background-position: 28px 0; }
