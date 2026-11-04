@@ -1,9 +1,7 @@
 import { InfoBox } from '../common/index.ts'
 
 export interface CulinaryNotesProps {
-  /** Optional dynamic culinary tip to display in place of default */
   tip?: string
-  /** Additional custom classes */
   className?: string
 }
 

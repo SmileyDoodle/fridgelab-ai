@@ -2,21 +2,13 @@ import type { AriaRole, KeyboardEvent, ReactNode } from 'react'
 import { AlertTriangle, Info, X } from 'lucide-react'
 
 export interface InfoBoxProps {
-  /** Semantic variant determining tone, colors, and accessibility role */
   variant?: 'tip' | 'warning' | 'error'
-  /** Optional header title */
   title?: string
-  /** Message body */
   children: ReactNode
-  /** Custom icon override */
   icon?: ReactNode
-  /** Callback when dismissed */
   onDismiss?: () => void
-  /** Accessible label for the dismiss button */
   dismissLabel?: string
-  /** Explicit ARIA role override */
   role?: AriaRole
-  /** Custom classes */
   className?: string
 }
 

@@ -2,15 +2,10 @@ import { Pill } from '../common/index.ts'
 import type { EnergyMode, EnergyModeOption } from '../../types/recipe.ts'
 
 export interface EnergyCardProps {
-  /** Mode preset details */
   mode: EnergyModeOption
-  /** Whether this energy mode is selected */
   selected: boolean
-  /** Selection handler */
   onSelect: (id: EnergyMode) => void
-  /** Disabled state */
   disabled?: boolean
-  /** Additional custom classes */
   className?: string
 }
 

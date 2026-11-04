@@ -3,17 +3,11 @@ import { Plus, Search, X } from 'lucide-react'
 import { Pill, StepIndicator } from '../common/index.ts'
 
 export interface CustomIngredientInputProps {
-  /** Array of currently added custom ingredient names */
   customIngredients: readonly string[]
-  /** Callback fired when a new ingredient is added */
   onAddIngredient: (name: string) => void
-  /** Callback fired when an added ingredient is dismissed */
   onRemoveIngredient: (name: string) => void
-  /** Callback fired when all custom ingredients are cleared */
   onClearIngredients?: () => void
-  /** Placeholder text for the input */
   placeholder?: string
-  /** Additional custom classes */
   className?: string
 }
 

@@ -2,7 +2,6 @@ import { QUICK_INSPIRATIONS, type QuickInspiration } from '../../constants/quick
 
 export interface WaitingSkilletCardProps {
   onSelectInspiration: (inspiration: QuickInspiration) => void
-  /** When true, shows an animated "cooking" state instead of the idle one */
   isLoading?: boolean
   className?: string
 }

@@ -2,29 +2,17 @@ import type { KeyboardEvent, MouseEvent, ReactNode } from 'react'
 import { X } from 'lucide-react'
 
 export interface PillProps {
-  /** Text content for the pill, alternative to children */
   label?: string
-  /** Pill content or label */
   children?: ReactNode
-  /** Visual variant conforming to design tokens */
   variant?: 'neutral' | 'sweet-spot' | 'highlight' | 'timer' | 'tag' | 'chip'
-  /** Sizing of the pill */
   size?: 'sm' | 'md'
-  /** Optional icon prefix */
   icon?: ReactNode
-  /** Whether the pill is selected (for toggleable chips) */
   selected?: boolean
-  /** Optional click handler making pill interactive */
   onClick?: (event: MouseEvent<HTMLSpanElement | HTMLButtonElement>) => void
-  /** If provided, renders a dismissible button with '×' icon */
   onRemove?: () => void
-  /** Accessible label for the remove button */
   removeLabel?: string
-  /** Disables click or remove interactions */
   disabled?: boolean
-  /** Additional custom classes */
   className?: string
-  /** Optional accessible label for the pill container */
   ariaLabel?: string
 }
 

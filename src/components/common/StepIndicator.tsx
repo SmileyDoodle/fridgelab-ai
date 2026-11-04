@@ -1,17 +1,11 @@
 import type { ReactNode } from 'react'
 
 export interface StepIndicatorProps {
-  /** The step number or label (e.g. 1, 2, 3) */
   step: number | string
-  /** Visual variant for the indicator */
   variant?: 'muted' | 'subtle' | 'brand'
-  /** Size dimension of the circle */
   size?: 'sm' | 'md' | 'lg'
-  /** Optional custom class overrides */
   className?: string
-  /** Accessible label override */
   ariaLabel?: string
-  /** Optional icon to replace or supplement step text */
   children?: ReactNode
 }
 

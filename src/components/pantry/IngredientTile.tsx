@@ -2,15 +2,10 @@ import { Check } from 'lucide-react'
 import type { Ingredient } from '../../types/recipe.ts'
 
 export interface IngredientTileProps {
-  /** The pantry ingredient */
   ingredient: Ingredient
-  /** Whether the ingredient is currently selected */
   selected: boolean
-  /** Toggle handler called when tile is clicked or pressed */
   onToggle: (id: string) => void
-  /** Disabled state */
   disabled?: boolean
-  /** Additional custom class overrides */
   className?: string
 }
 

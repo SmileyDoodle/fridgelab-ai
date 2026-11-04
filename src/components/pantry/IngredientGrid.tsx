@@ -5,15 +5,10 @@ import type { Ingredient } from '../../types/recipe.ts'
 import { IngredientTile } from './IngredientTile.tsx'
 
 export interface IngredientGridProps {
-  /** Pantry ingredients list, defaults to initial 12 staples */
   ingredients?: readonly Ingredient[]
-  /** Array or set of currently selected ingredient IDs */
   selectedIds: readonly string[] | Set<string>
-  /** Callback when an ingredient tile is toggled */
   onToggleIngredient: (id: string) => void
-  /** Callback when clearing all selected ingredients */
   onClearSelection?: () => void
-  /** Additional custom classes */
   className?: string
 }
 

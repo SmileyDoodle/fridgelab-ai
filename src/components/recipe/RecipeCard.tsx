@@ -13,13 +13,9 @@ const DIET_ICONS = {
 } satisfies Record<DietaryTag, unknown>
 
 export interface RecipeCardProps {
-  /** The recipe to display */
   recipe: Recipe
-  /** Whether a new recipe is currently generating */
   isLoading?: boolean
-  /** Handler invoked when user requests another recipe spin */
   onRetry?: () => void
-  /** Optional custom classes */
   className?: string
 }
 

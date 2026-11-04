@@ -2,17 +2,11 @@ import type { ReactNode } from 'react'
 import { Loader2, Sparkles } from 'lucide-react'
 
 export interface SubmitButtonProps {
-  /** Click action */
   onClick?: () => void
-  /** Loading state while recipe is simmering */
   isLoading?: boolean
-  /** Disabled state */
   disabled?: boolean
-  /** Optional custom button label */
   label?: string
-  /** Children to override label */
   children?: ReactNode
-  /** Additional custom classes */
   className?: string
 }
 
