@@ -127,8 +127,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           content: `Ingredients: ${sanitizedIngredients.join(', ')}. Energy level: ${energyDescription}`,
         },
       ],
-      max_tokens: 450,
+      max_tokens: 800,
       temperature: 0.6,
+      chat_template_kwargs: {
+        enable_thinking: false,
+      },
     });
 
     const rawText =

@@ -65,6 +65,24 @@ Starts the Vite local development server with the offline mock API enabled:
 npm run dev
 ```
 
+### Testing the Real Workers AI Model Locally (Wrangler)
+
+To test `functions/api/recipe.ts` against the live Cloudflare Workers AI model on `localhost` without deploying:
+
+1. Build the frontend:
+   ```bash
+   npm run build
+   ```
+2. Log in to Cloudflare (first time only):
+   ```bash
+   npx wrangler login
+   ```
+3. Start the local Pages dev server with the `AI` binding:
+   ```bash
+   npx wrangler pages dev dist --ai AI
+   ```
+4. Open the URL printed by Wrangler.
+
 ---
 
 ## 📄 License
