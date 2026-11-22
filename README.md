@@ -2,7 +2,7 @@
 
 A cozy, zero-waste recipe generator that invents comforting home-cooked meals from whatever ingredients you already have on hand.
 
-Powered by **Cloudflare Workers AI** (Meta Llama 3.1 8B Instruct) at the edge, built with **React 19**, **TypeScript**, and **Tailwind CSS**.
+Powered by **Cloudflare Workers AI** (Google Gemma 4 26B A4B Instruct) at the edge, built with **React 19**, **TypeScript**, and **Tailwind CSS**.
 
 ---
 
@@ -23,7 +23,7 @@ Powered by **Cloudflare Workers AI** (Meta Llama 3.1 8B Instruct) at the edge, b
 
 ## 🏗 Architecture & Engineering Highlights
 
-- **Edge Serverless Inference**: Deployed via Cloudflare Pages Functions using Cloudflare Workers AI (`@cf/meta/llama-3.1-8b-instruct-fp8`) for sub-second edge response times with zero client-side API keys.
+- **Edge Serverless Inference**: Deployed via Cloudflare Pages Functions using Cloudflare Workers AI (`@cf/google/gemma-4-26b-a4b-it`) for sub-second edge response times with zero client-side API keys.
 - **Multi-Step Safety & Prompt Guardrails**:
   - *Food Validation*: Rejects non-edible inputs (`NOT_FOOD`) before recipe generation.
   - *Safety Check*: Refuses unsafe or hazardous combinations (`NO_SAFE_RECIPE`).
@@ -44,7 +44,7 @@ Powered by **Cloudflare Workers AI** (Meta Llama 3.1 8B Instruct) at the edge, b
 | **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) + Custom Typography (`Playfair Display` + `Inter`) |
 | **Icons** | [Lucide React](https://lucide.dev/) |
 | **Backend / Edge** | [Cloudflare Pages Functions](https://pages.cloudflare.com/) + [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/) |
-| **AI Model** | Meta Llama 3.1 8B Instruct FP8 (`@cf/meta/llama-3.1-8b-instruct-fp8`) |
+| **AI Model** | Google Gemma 4 26B A4B Instruct (`@cf/google/gemma-4-26b-a4b-it`) |
 | **Testing** | [Vitest](https://vitest.dev/) |
 | **Linter** | [Oxlint](https://oxc.rs/docs/guide/usage/linter.html) |
 
