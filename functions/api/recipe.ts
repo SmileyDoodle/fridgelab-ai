@@ -69,7 +69,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const energyDescription = ENERGY_PROMPTS[energy.toLowerCase()] || energy;
 
     // Call Cloudflare's serverless AI at the edge
-    const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fp8', {
+    const response = await env.AI.run('@cf/google/gemma-4-26b-a4b-it', {
       messages: [
         {
           role: 'system',
@@ -131,7 +131,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       temperature: 0.6,
     });
 
-    const aiText = typeof response?.response === 'string' ? response.response.trim() : '';
+    const rawText =
+      typeof response?.response === 'string'
+        ? response.response
+        : typeof response?.choices?.[0]?.message?.content === 'string'
+          ? response.choices[0].message.content
+          : '';
+    const aiText = rawText.trim();
 
     // Check if the AI indicated non-edible input
     if (
